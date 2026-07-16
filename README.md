@@ -10,21 +10,32 @@ This README documents the full journey from local development to a working multi
 
 ### Application layer
 
+```mermaid
+flowchart TD
+    Browser["Browser"]
+    Nginx["Nginx frontend<br/>:80 → host :3000<br/>serves static files + reverse proxy"]
+    Flask["Flask backend<br/>Gunicorn :8000"]
+    DB[("PostgreSQL 16<br/>:5432")]
+
+    Browser -->|"GET /"| Nginx
+    Nginx -->|"try_files → index.html<br/>(SPA fallback)"| Nginx
+    Browser -->|"fetch('/api/*')"| Nginx
+    Nginx -->|"proxy_pass<br/>/api/ → backend:8000/api/"| Flask
+    Flask -->|"SQL queries"| DB
+```
+
 - **Frontend**: Nginx serving static files + reverse-proxying `/api/` calls to the backend, so the browser only ever talks to one origin (avoids CORS).
 - **Backend**: Flask + Gunicorn API on port 8000.
 - **Database**: Postgres 16 (Alpine), initialized from `database/init.sql`.
 
 ### Infrastructure layer — 3-node Docker Swarm cluster on EC2
 
-![AWS architecture diagram — 3-node Docker Swarm cluster](/Users/thantzinmin/Devops Practice/devops-handbook/aws-docker-swarm-orchestration/architecture-diagram.png)
-
-```
+![AWS architecture diagram — 3-node Docker Swarm cluster](./architecture-diagram.png)
 
 Docker Swarm's **routing mesh** means any node's public IP on port `3000` will correctly route the request to wherever the `frontend` service replica actually lives — the app doesn't need to be running on the node you connect to.
 
-</details>
-
 ---
+
 
 ## Stage 1 — Local development with Docker Compose
 
