@@ -10,6 +10,7 @@ This README documents the full journey from local development to a working multi
 
 ### Application layer
 
+```
 flowchart LR
     Browser["Browser"]
     Nginx["Nginx — frontend<br/>:80 → host :3000<br/>serves static files + reverse proxy<br/>try_files $uri → /index.html (SPA fallback)"]
@@ -30,6 +31,7 @@ flowchart LR
     class Nginx nginx
     class Flask flask
     class DB db
+```
 
 - **Frontend**: Nginx serving static files + reverse-proxying `/api/` calls to the backend, so the browser only ever talks to one origin (avoids CORS).
 - **Backend**: Flask + Gunicorn API on port 8000.
