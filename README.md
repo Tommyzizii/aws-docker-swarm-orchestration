@@ -10,19 +10,26 @@ This README documents the full journey from local development to a working multi
 
 ### Application layer
 
-```mermaid
-flowchart TD
+flowchart LR
     Browser["Browser"]
-    Nginx["Nginx frontend<br/>:80 → host :3000<br/>serves static files + reverse proxy"]
+    Nginx["Nginx — frontend<br/>:80 → host :3000<br/>serves static files + reverse proxy<br/>try_files $uri → /index.html (SPA fallback)"]
     Flask["Flask backend<br/>Gunicorn :8000"]
     DB[("PostgreSQL 16<br/>:5432")]
 
-    Browser -->|"GET /"| Nginx
-    Nginx -->|"try_files → index.html<br/>(SPA fallback)"| Nginx
+    Browser -->|"GET / (page load)"| Nginx
     Browser -->|"fetch('/api/*')"| Nginx
-    Nginx -->|"proxy_pass<br/>/api/ → backend:8000/api/"| Flask
+    Nginx -->|"proxy_pass /api/ → backend:8000/api/"| Flask
     Flask -->|"SQL queries"| DB
-```
+
+    classDef browser fill:#eef0f2,stroke:#3a4652,stroke-width:2px,color:#1a1d21;
+    classDef nginx fill:#eef8f6,stroke:#1f7a6c,stroke-width:2px,color:#1a1d21;
+    classDef flask fill:#eef0fa,stroke:#3d4f91,stroke-width:2px,color:#1a1d21;
+    classDef db fill:#eaf1f8,stroke:#375f8c,stroke-width:2px,color:#1a1d21;
+
+    class Browser browser
+    class Nginx nginx
+    class Flask flask
+    class DB db
 
 - **Frontend**: Nginx serving static files + reverse-proxying `/api/` calls to the backend, so the browser only ever talks to one origin (avoids CORS).
 - **Backend**: Flask + Gunicorn API on port 8000.
