@@ -10,7 +10,7 @@ This README documents the full journey from local development to a working multi
 
 ### Application layer
 
-```
+```mermaid
 flowchart LR
     Browser["Browser"]
     Nginx["Nginx — frontend<br/>:80 → host :3000<br/>serves static files + reverse proxy<br/>try_files $uri → /index.html (SPA fallback)"]
